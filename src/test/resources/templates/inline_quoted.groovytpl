@@ -1,0 +1,64 @@
+if (node.id() != null) {
+  a(id:node.id())
+}
+switch(node.type) {
+case "emphasis":
+  em(class:node.getRole()) {
+    yield node.text
+  }
+  break
+case "strong":
+  strong(class:node.getRole()) {
+    yield node.text
+  }
+  break
+case "monospaced":
+  code(class:node.getRole()) {
+    yield node.text
+  }
+  break
+case "superscript":
+  sup(class:node.getRole()) {
+    yield node.text
+  }
+  break
+case "subscript":
+  sub(class:node.getRole()) {
+    yield node.text
+  }
+  break
+case "double":
+  if (node.getRole() != null) {
+    span class:node.getRole() "&#8220;${node.text}&#8221;"
+  } else {
+    yieldUnescaped "&#8220;${node.text}&#8221;"
+  }
+  break
+case "single":
+  if (node.role() != null) {
+    span class:node.getRole() "&#8216;${node.text}&#8217;"
+  } else {
+    yieldUnescaped "&#8216;${node.text}&#8217;"
+  }
+  break
+case "asciimath":
+case "latexmath":
+      BLOCK_MATH_DELIMITERS = [
+        asciimath: ['\\$', '\\$'],
+        latexmath: ['\\[', '\\]']]
+
+      INLINE_MATH_DELIMITERS = [
+        asciimath: ['\\$', '\\$'],
+        latexmath: ['\\(', '\\)']]
+
+  open = INLINE_MATH_DELIMITERS[node.type][0]
+  close = INLINE_MATH_DELIMITERS[node.type][1]
+  yieldUnescaped "${open}${node.text}${close}"
+  break
+default:
+  if (node.getRole() != null) {
+    span(class:node.getRole()) { yield node.text }
+  } else {
+    yield node.text
+  }
+}

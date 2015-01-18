@@ -1,0 +1,32 @@
+import org.asciidoctor.ast.Section
+import org.asciidoctor.ast.AbstractBlock
+// support for vertical slides
+boolean hideTitle = node.title() == '!'
+List<AbstractBlock> subsections = node.blocks().findAll {
+  it instanceof Section
+}
+
+
+if (node.level == 1 && !subsections.empty) {
+  section {
+    section(id:(hideTitle ? null : node.id()), 'data-transition':node.getAttr('data-transition'), 'data-transition-speed':node.getAttr('data-transition-speed'), 'data-background':node.getAttr('data-background'), 'data-background-size':node.getAttr('data-background-size'), 'data-background-repeat':node.getAttr('data-background-repeat'), 'data-background-transition':node.getAttr('data-background-transition')) {
+      if (!hideTitle) {
+        h2 node.title()
+      }
+      (node.blocks() - subsections).each { block ->
+         yieldUnescaped block.convert()
+      }
+    }
+    subsections.each { subsection ->
+      yieldUnescaped subsection.convert()
+    }
+  }
+} else {
+// standalone slides
+  section(id:(hideTitle ? null : node.id()), 'data-transition':node.getAttr('data-transition'), 'data-transition-speed':node.getAttr('data-transition-speed'), 'data-background':node.getAttr('data-background'), 'data-background-size':node.getAttr('data-background-size'), 'data-background-repeat':node.getAttr('data-background-repeat'), 'data-background-transition':node.getAttr('data-background-transition')) {
+    if (!hideTitle) {
+      h2 node.title()
+    }
+    yieldUnescaped node.content()?.trim()
+  }
+}

@@ -1,0 +1,10 @@
+div (class:"paragraph ${node.role() != null ? node.role() : ''}", id:node.id()) {
+  if (node.title() != null) {
+    div class:'title', node.title()
+  }
+  if (node.hasRole('small')) {
+    small node.content()
+  } else {
+    p node.content()
+  }
+}

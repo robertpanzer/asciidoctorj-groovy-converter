@@ -1,0 +1,172 @@
+yieldUnescaped '<!DOCTYPE html>'
+html {
+  head {
+    meta charset:"utf-8"
+    ["description", "keywords", "author", "copyright"].each { key ->
+       if (options[key] != null) {
+          meta(name:key, content: options[key])
+       }
+    }
+    title(node.doctitle())
+    meta(content:'yes', name:'apple-mobile-web-app-capable')
+    meta(content:'black-translucent', name:'apple-mobile-web-app-status-bar-style')
+    meta(content:'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui', name:'viewport')
+    link(href:'reveal.js/css/reveal.min.css', rel:'stylesheet')
+    if (node.attributes['revealjs_customtheme'] != null) {
+      link(rel:'stylesheet', href:node.attributes['revealjs_customtheme'], id:'theme')
+    } else {
+      link(rel:'stylesheet', href:'reveal.js/css/theme/default.css', id:'theme')
+    }
+    if (node.attributes['stem'] != null) {
+      String assetUriScheme = node.getAttr('asset-uri-scheme', 'https', true)
+      String cdnBase = "${assetUriScheme}://cdnjs.cloudflare.com/ajax/libs"
+      String eqnumsVal = node.getAttr('eqnums', 'none', true)
+      if (eqnumsVal == '') {
+        eqnumsVal = 'AMS'
+      }
+      eqnumsOpt="equationNumber: { autoNumber: \"${eqnumsVal}\" }"
+
+      BLOCK_MATH_DELIMITERS = [
+        asciimath: ['\\$', '\\$'],
+        latexmath: ['\\[', '\\]']]
+
+      INLINE_MATH_DELIMITERS = [
+        asciimath: ['\\$', '\\$'],
+        latexmath: ['\\(', '\\)']]
+
+
+      script(type:'text/x-mathjax-config', """
+          MathJax.Hub.Config({
+                tex2jax: {
+                  inlineMath: [${groovy.json.JsonOutput.toJson(INLINE_MATH_DELIMITERS['latexmath'])}],
+                  displayMath: [${groovy.json.JsonOutput.toJson(BLOCK_MATH_DELIMITERS['latexmath'])}],
+                  ignoreClass: "nostem|nolatexmath"
+                },
+                asciimath2jax: {
+                  delimiters: [${groovy.json.JsonOutput.toJson(BLOCK_MATH_DELIMITERS['asciimath'])}],
+                  ignoreClass: "nostem|noasciimath"
+                },
+                TeX: {${eqnumsOpt}}
+                });
+""")
+      script(src:"${cdnBase}/mathjax/2.4.0/MathJax.js?config=TeX-MML-AM_HTMLorMML") {}
+
+    }
+
+    /*
+    / Default theme required even when using custom theme
+    - case attr 'source-highlighter'
+    - when 'coderay'
+      - if (attr 'coderay-css', 'class') == 'class'
+        - if @safe >= Asciidoctor::SafeMode::SECURE || (attr? :linkcss)
+          link rel='stylesheet' href=normalize_web_path('asciidoctor-coderay.css', (attr :stylesdir, ''))
+        - else
+          style=Asciidoctor::Stylesheets.instance.coderay_stylesheet_data
+    - when 'pygments'
+      - if (attr 'pygments-css', 'class') == 'class'
+        - if @safe >= Asciidoctor::SafeMode::SECURE || (attr? :linkcss)
+          link rel='stylesheet' href=normalize_web_path('asciidoctor-pygments.css', (attr :stylesdir, ''))
+        - else
+          style=Asciidoctor::Stylesheets.instance.pygments_stylesheet_data(attr 'pygments-style')
+          */
+    // For syntax highlighting
+    link(href:'reveal.js/lib/css/zenburn.css', rel:'stylesheet')
+    // If the query includes 'print-pdf', use the PDF print sheet
+    /*
+    javascript """
+      document.write( '<link rel="stylesheet" href="reveal.js/css/print/' + ( window.location.search.match( /print-pdf/gi ) ? 'pdf' : 'paper' ) + '.css" type="text/css" media="print">' );
+ """
+ */
+    /*
+    - unless (docinfo_content = docinfo :header, '.html').empty?
+      =docinfo_content
+      */
+ }
+ body {
+    div(class:'reveal') {
+      // Any section element inside of this container is displayed as a slide
+      div(class:'slides') {
+        if (node.attributes['showtitle'] != null || !node.attributes['notitle']) {
+          section {
+            h2(node.doctitle())
+            //p small:node.author
+          }
+        }
+        yieldUnescaped node.content()
+      }
+    }
+    script(src:'reveal.js/lib/js/head.min.js'){}
+    script(src:'reveal.js/js/reveal.min.js'){}
+
+    script(type:'text/javascript', """
+      // See https://github.com/hakimel/reveal.js#configuration for a full list of configuration options
+      Reveal.initialize({
+        // Display controls in the bottom right corner
+        controls: ${node.getAttr('revealjs_controls', 'true')},
+        // Display a presentation progress bar
+        progress: ${node.getAttr('revealjs_progress', 'true')},
+        // Display the page number of the current slide
+        slideNumber: ${node.getAttr('revealjs_slidenumber', 'false')},
+        // Push each slide change to the browser history
+        history: ${node.getAttr('revealjs_history', 'false')},
+        // Enable keyboard shortcuts for navigation
+        keyboard: ${node.getAttr('revealjs_keyboard', 'true')},
+        // Enable the slide overview mode
+        overview: ${node.getAttr('revealjs_overview', 'true')},
+        // Vertical centering of slides
+        center: ${node.getAttr('revealjs_center', 'true')},
+        // Enables touch navigation on devices with touch input
+        touch: ${node.getAttr('revealjs_touch', 'true')},
+        // Loop the presentation
+        loop: ${node.getAttr('revealjs_loop', 'false')},
+        // Change the presentation direction to be RTL
+        rtl: ${node.getAttr('revealjs_rtl', 'false')},
+        // Turns fragments on and off globally
+        fragments: ${node.getAttr('revealjs_fragments', 'true')},
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: ${node.getAttr('revealjs_embedded', 'false')},
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: ${node.getAttr('revealjs_autoslide', 0)},
+        // Stop auto-sliding after user input
+        autoSlideStoppable: ${node.getAttr('revealjs_autoslidestoppable', 'true')},
+        // Enable slide navigation via mouse wheel
+        mouseWheel: ${node.getAttr('revealjs_mousewheel', 'false')},
+        // Hides the address bar on mobile devices
+        hideAddressBar: ${node.getAttr('revealjs_hideaddressbar', 'true')},
+        // Opens links in an iframe preview overlay
+        previewLinks: ${node.getAttr('revealjs_previewlinks', 'false')},
+        // Theme (e.g., beige, blond, default, moon, night, serif, simple, sky, solarized)
+        theme: Reveal.getQueryHash().theme || '${node.getAttr('revealjs_theme', 'default')}',
+        // Transition style (e.g., default, cube, page, concave, zoom, linear, fade, none)
+        transition: Reveal.getQueryHash().transition || '${node.getAttr('revealjs_transition', 'default')}',
+        // Transition speed (e.g., default, fast, slow)
+        transitionSpeed: '${node.getAttr('revealjs_transitionspeed', 'default')}',
+        // Transition style for full page slide backgrounds (e.g., default, none, slide, concave, convex, zoom)
+        backgroundTransition: '${node.getAttr('revealjs_backgroundtransition', 'default')}',
+        // Number of slides away from the current that are visible
+        viewDistance: ${node.getAttr('revealjs_viewdistance', 3)},
+        // Parallax background image (e.g., "'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg'")
+        parallaxBackgroundImage: '${node.getAttr('revealjs_parallaxbackgroundimage', '')}',
+        // Parallax background size in CSS syntax (e.g., "2100px 900px")
+        parallaxBackgroundSize: '${node.getAttr('revealjs_parallaxbackgroundsize', '')}',
+        // Optional libraries used to extend on reveal.js
+        dependencies: [
+            { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+            { src: 'reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            { src: 'reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+            ${node.isAttr('source-highlighter', 'highlight.js') ? "{ src: 'reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } }," : ''}
+            { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true, condition: function() { return !!document.body.classList; } },
+            { src: 'reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }
+        ]
+      });
+      """)
+      /*
+    - unless (docinfo_content = (docinfo :footer, '.html')).empty?
+      =docinfo_content
+*/
+
+  }
+}

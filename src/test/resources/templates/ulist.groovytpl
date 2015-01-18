@@ -1,0 +1,38 @@
+checklist = node.isOption('checklist') ? 'checklist' : null
+if (checklist != null) {
+    if (node.isOption('interactive')) {
+        markerChecked = '<input type="checkbox" data-item-complete="1" checked>'
+        markerUnchecked = '<input type="checkbox" data-item-complete="0">'
+    } else {
+        if (document.isAttr('icons', 'font')) {
+            markerChecked = '<i class="icon-check"></i>'
+            markerUnchecked = '<i class="icon-check-empty"></i>'
+        } else {
+            // could use &#9745 (checked ballot) and &#9744 (ballot) w/o font instead
+            markerChecked = '<input type="checkbox" data-item-complete="1" checked disabled>'
+            markerUnchecked = '<input type="checkbox" data-item-complete="0" disabled>'
+        }
+    }
+}
+div(id: node.id(), class: "ulist ${checklist} ${node.style} ${node.role}") {
+    if (node.title != null) {
+        div class: 'title', node.title
+    }
+    ul(class: "${checklist} node.style") {
+        node.items.each { item ->
+            li(class: "${node.isOption('step') || node.hasRole('step') ? 'fragment' : ''}") {
+                p {
+                    if (checklist != null && item.isAttr('checkbox')) {
+                        yieldUnescaped item.isAttr('checked') ? markerChecked : markerUnchecked
+                        yiedUnescaped item.text
+                    } else {
+                        yieldUnescaped item.text
+                    }
+                }
+                if (item.blocks() != null && !item.blocks().empty) {
+                    yieldUnescaped item.content()
+                }
+            }
+        }
+    }
+}

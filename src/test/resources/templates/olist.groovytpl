@@ -1,0 +1,15 @@
+div (class: "olist ${node.style} ${node.role}", id: node.id()) {
+    if (node.title != null) {
+        div class: "title" node.title
+    }
+    ol(class: node.style, start: node.getAttr('start'), type:node.listMarkerKeyword()) {
+        node.items.each { item ->
+            li(class: "${node.isOption('step') || node.hasRole('step') ? 'fragment' : ''}") {
+                p item.text
+                if (item.blocks != null) {
+                   yieldUnescaped item.content
+                }
+            }
+        }
+    }
+}

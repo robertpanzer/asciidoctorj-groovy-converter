@@ -1,0 +1,64 @@
+apply plugin: 'groovy'
+apply plugin: 'codenarc'
+apply plugin: 'maven-publish'
+//apply from: 'gradle/publish.gradle'
+
+sourceCompatibility = 1.6
+version = '1.0'
+
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+    }
+    dependencies {
+        classpath "com.jfrog.bintray.gradle:gradle-bintray-plugin:0.5"
+    }
+}
+
+repositories {
+    jcenter()
+    mavenLocal()
+    maven { url 'http://dl.bintray.com/lordofthejars/maven'}
+}
+
+dependencies {
+    compile 'org.asciidoctor:asciidoctorj:1.5.3-SNAPSHOT'
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+def projectArtifactId = 'asciidoctorj-groovy-converter'
+def groupId = 'org.asciidoctor'
+
+
+dependencies {
+    compile 'org.codehaus.groovy:groovy-all:2.3.9'
+    compile 'org.jruby:jruby:1.7.18'
+    testCompile('org.spockframework:spock-core:0.7-groovy-2.0') {
+        exclude group: 'org.codehaus.groovy', module: 'groovy-all'
+        exclude group: 'org.hamcrest', module: 'hamcrest-core'
+    }
+    testCompile 'junit:junit:4.12'
+}
+
+codenarc {
+    configFile = file('config/codenarc/codenarc.groovy')
+    // run codenarc on production sources only
+    sourceSets = [project.sourceSets.main]
+}
+
+task sourceJar(type: Jar) {
+    group 'Build'
+    description 'An archive of the source code'
+    classifier 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    sourceJar
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.2.1'
+}
+

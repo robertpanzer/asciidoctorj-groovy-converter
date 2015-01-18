@@ -1,0 +1,26 @@
+= This is the title
+:stem:
+
+== And again
+
+Some text
+
+And a formula: stem:[H_2 O]
+
+And a list:
+
+[lowerroman]
+. One
+. Two
+. Three
+
+=== Let's get vertical
+
+
+[big]##T##his is so vertical
+
+'`Some'` ^code^ `Hello World`
+
+
+
+
